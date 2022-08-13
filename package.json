@@ -1,0 +1,53 @@
+{
+  "name": "homebrewdj",
+  "author": "philipp Gaßner <activator112233@gmail.com> (https://cyberpsych0si.is/)",
+  "description": "General Purpose Library for MIDI Mappings",
+  "bugs": {
+    "url": "https://github.com/thallosaurus/homebrewdj-launchpad-driver/issues"
+  },
+  "keywords": [
+    "midi",
+    "mappings",
+    "application"
+  ],
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "dependencies": {
+    "homebrewdj-launchpad-driver": "^0.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thallosaurus/homebrewdj"
+  },
+  "files": [
+    "dist/hDJMidiOutputBuffer.d.ts",
+    "dist/hDJMidiOutputBuffer.js",
+    "dist/hDJMidiRecv.d.ts",
+    "dist/hDJMidiRecv.js",
+    "dist/hDJMidiRecvModel.d.ts",
+    "dist/hDJMidiRecvModel.js",
+    "dist/index.d.ts",
+    "dist/index.js"
+  ],
+  "devDependencies": {
+    "@types/jasmine": "^4.0.3",
+    "@types/node": "^18.7.2",
+    "jasmine": "^4.3.0",
+    "jasmine-spec-reporter": "^7.0.0",
+    "jasmine-ts": "^0.4.0",
+    "nodemon": "^2.0.19",
+    "ts-node": "^10.9.1",
+    "typedoc": "^0.23.10",
+    "typescript": "^4.7.4"
+  },
+  "scripts": {
+    "prepare": "npm run build",
+    "push:version": "npm version patch",
+    "test": "echo 'all checks passed (dummy)' && exit 0",
+    "generate:docs": "typedoc",
+    "build": "tsc",
+    "dev": "nodemon src/index.ts"
+  }
+}
