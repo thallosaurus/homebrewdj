@@ -25,8 +25,8 @@ jobs:
         with:
           node-version: 16
       - run: sudo apt-get install -y libasound2-dev
-      - run: npm ci
-      - run: npm test
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
 
   publish-doc:
     needs: build
@@ -40,8 +40,8 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v1
       - run: sudo apt-get install -y libasound2-dev
-      - run: npm ci
-      - run: npm run-script generate:docs
+      - run: yarn install --frozen-lockfile
+      - run: yarn run-script generate:docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
