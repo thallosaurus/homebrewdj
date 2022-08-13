@@ -1,4 +1,5 @@
-import { hDJMidiRecv, hDJRecvCoord, MessageType } from "homebrewdj-launchpad-driver";
+import { hDJMidiRecv, hDJRecvCmd, hDJRecvCoord, MessageType } from "homebrewdj-launchpad-driver";
+import { hDJMidiSend } from "./hDJMidiSend";
 import { Deck } from "./Deck";
 import { hDJWidget } from "./hDJMidiModel";
 
@@ -19,56 +20,56 @@ function intersects(sourcePoint: hDJRecvCoord, q: WidgetQueue) {
  */
 function main() {
     const launchpad = new hDJMidiRecv();
-    launchpad.connect(0, 0);
+    launchpad.connect(1, 1);
 
     let queue: WidgetQueue[] = [
         {
-            data: new Deck(),
+            data: new Deck(0),
             pos: {
                 x: 0,
                 y: 0
             }
         },
         {
-            data: new Deck(true),
+            data: new Deck(1, true),
             pos: {
-                x: 2,
+                x: 0,
                 y: 4
             }
         }
     ];
 
-    launchpad.on("matrix_event", (data) => {
+    const algo = (data: hDJRecvCmd) => {
         //console.log(data);
-
-        if (data.type == MessageType.NOTE_ON) {
             let row = data.pos?.x;
             let col = data.pos?.y;
-
+    
             let touchTarget = queue.find((v, i) => {
                 let hasTappedWidget = intersects(data.pos!, v);
-                //console.log(hasTappedWidget);
                 return hasTappedWidget;
             });
-
+    
             //We tapped on a mapped button
             if (touchTarget) {
-                //console.log(touchTarget, row! - touchTarget!.pos.x, col! - touchTarget!.pos.y);
                 let relPos = {
                     x: row! - touchTarget!.pos.x,
                     y: col! - touchTarget!.pos.y
                 };
-
-                touchTarget?.data.processEvent(relPos);
+    
+                touchTarget?.data.processEvent(data, relPos);
             }
+    };
 
-        }
-    });
+    launchpad.on("matrix_event_release", algo)
+
+    launchpad.on("matrix_event_press", algo);
 
     for (let e of queue) {
         launchpad.boundBuffer.setXY(e.data.getAsBuffer(), e.pos, e.data.width);
     }
-
-    //console.log(launchpad.boundBuffer);
 }
 main();
+
+process.on("SIGTERM", () => {
+    hDJMidiSend.close();
+})

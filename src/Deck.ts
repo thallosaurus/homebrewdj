@@ -6,11 +6,13 @@ export class Deck extends EventTarget implements hDJWidget{
     width: number = 4;
     height: number = 6;
     children: hDJWidget[] = [];
+    port: number;
 
-    constructor(inverted: boolean = false) {
+    constructor(port: number, inverted: boolean = false) {
         super();
+        this.port = port;
         for (let i = 0; i < this.height; i++) {
-            this.children.push(new StripWidget(i, inverted));
+            this.children.push(new StripWidget(port, i, inverted));
         }
     }
 
@@ -18,9 +20,9 @@ export class Deck extends EventTarget implements hDJWidget{
      * Pass down event to the corresponding child element
      * @param data 
      */
-    processEvent(data: hDJRecvCoord): void {
+    processEvent(msg: hDJRecvCmd, data: hDJRecvCoord): void {
         let strip = this.children[data.x];
-        strip.processEvent({
+        strip.processEvent(msg, {
             x: 0,
             y: data.y
         });

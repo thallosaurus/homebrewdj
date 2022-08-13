@@ -1,5 +1,4 @@
 import { hDJRecvCmd, hDJRecvCoord } from "homebrewdj-launchpad-driver";
-import { StripWidget } from "./StripWidget";
 
 /**
  * Holds methods for acting as a homebrewDJ Widget
@@ -8,10 +7,11 @@ import { StripWidget } from "./StripWidget";
  * @extends {hDJRecvCoord}
  */
 export interface hDJWidget {
+    port: number;
     width: number;
     height: number;
     getAsBuffer(): number[];
-    processEvent(data: hDJRecvCoord): void;
+    processEvent(msg: hDJRecvCmd, data: hDJRecvCoord): void;
 }
 
 /**
