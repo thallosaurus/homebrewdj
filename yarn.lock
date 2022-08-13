@@ -260,10 +260,9 @@ has-flag@^3.0.0:
   resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-3.0.0.tgz#b5d454dc2199ae225699f3467e5a07f3b955bafd"
   integrity sha512-sKJf1+ceQBr4SMkvQnBDNDtf4TXpVhVGateu0t918bl30FnbE2m4vNLX+VWe/dpjlb+HugGYzW7uQXH98HPEYw==
 
-homebrewdj-launchpad-driver@^0.0.3:
+"homebrewdj-launchpad-driver@https://github.com/thallosaurus/homebrewdj-launchpad-driver.git":
   version "0.0.3"
-  resolved "https://registry.yarnpkg.com/homebrewdj-launchpad-driver/-/homebrewdj-launchpad-driver-0.0.3.tgz#100d3dc3c7a0dc6cf1510b73e572a968735abad5"
-  integrity sha512-wWj6hLaOod90B7cMQSbbIeQAYqHaD7gPc5MJr7EzhWL+paEtCZEK45cNUWugNZMIxw6CVqD/ZRYF2s3hdaTm8A==
+  resolved "https://github.com/thallosaurus/homebrewdj-launchpad-driver.git#4b607813dd31145f8fa99da95d6ac65f35c811a0"
   dependencies:
     midi "^2.0.0"
 
