@@ -1,1 +1,8 @@
-console.log("Hello World");
+/**
+ * The main function. Have fun <3
+ *
+ */
+function main() {
+
+}
+main();
