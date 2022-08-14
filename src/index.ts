@@ -2,9 +2,10 @@ import { hDJMidiRecv, hDJRecvCmd, hDJRecvCoord, MessageType } from "homebrewdj-l
 import { hDJMidiSend } from "./hDJMidiSend";
 import { Deck } from "./Deck";
 import { hDJWidget } from "./hDJMidiModel";
+import { EventEmitter } from "stream";
 
-interface WidgetQueue {
-    data: hDJWidget,
+export interface WidgetQueue {
+    data: hDJWidget & EventEmitter,
     pos: hDJRecvCoord
 }
 
@@ -14,37 +15,55 @@ function intersects(sourcePoint: hDJRecvCoord, q: WidgetQueue) {
         && sourcePoint.y >= q.pos.y && sourcePoint.y < q.pos.y + q.data.width;
 }
 
-/**
- * The main function. Have fun <3
- *
- */
-function main() {
-    const launchpad = new hDJMidiRecv();
-    launchpad.connect(1, 1);
+class Main {
+    private queue: WidgetQueue[] = [];
+    private launchpad = new hDJMidiRecv();
 
-    let queue: WidgetQueue[] = [
-        {
-            data: new Deck(0),
-            pos: {
-                x: 0,
-                y: 0
-            }
-        },
-        {
-            data: new Deck(1, true),
-            pos: {
-                x: 0,
-                y: 4
-            }
-        }
-    ];
+    constructor() {
+        this.launchpad.connect(0, 0);
+        const left = new Deck(0);
+        this.addToQueue(left, {
+            x: 0,
+            y: 0
+        });
+        
+        const right = new Deck(1, true);
+        this.addToQueue(right, {
+            x: 0,
+            y: 4
+        });
 
-    const algo = (data: hDJRecvCmd) => {
+
+        this.launchpad.on("matrix_event_release", this.loopAlgo.bind(this))
+
+        this.launchpad.on("matrix_event_press", this.loopAlgo.bind(this));
+
+        process.on("SIGTERM", () => {
+            hDJMidiSend.close();
+        });
+        setInterval(() => {
+            this.refreshScreen();
+        }, 100);
+        this.refreshScreen();
+    }
+
+    addToQueue(widget: hDJWidget & EventEmitter, pos: hDJRecvCoord) {
+        widget.on("change", () => {
+            this.refreshScreen();
+        });
+
+        this.queue.push({
+            data: widget,
+            pos: pos
+        });
+    }
+
+    private loopAlgo(data: hDJRecvCmd) {
         //console.log(data);
             let row = data.pos?.x;
             let col = data.pos?.y;
     
-            let touchTarget = queue.find((v, i) => {
+            let touchTarget = this.queue.find((v, i) => {
                 let hasTappedWidget = intersects(data.pos!, v);
                 return hasTappedWidget;
             });
@@ -60,16 +79,20 @@ function main() {
             }
     };
 
-    launchpad.on("matrix_event_release", algo)
+    private refreshScreen(): void {
+        for (let e of this.queue) {
+            this.launchpad.boundBuffer.setXY(e.data.getAsBuffer(), e.pos, e.data.width);
 
-    launchpad.on("matrix_event_press", algo);
-
-    for (let e of queue) {
-        launchpad.boundBuffer.setXY(e.data.getAsBuffer(), e.pos, e.data.width);
+        }
     }
 }
-main();
 
-process.on("SIGTERM", () => {
-    hDJMidiSend.close();
-})
+/**
+ * The main function. Have fun <3
+ *
+ */
+export function mainTui() {
+    let main = new Main();
+}
+mainTui();
+

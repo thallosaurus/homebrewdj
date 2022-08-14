@@ -26,6 +26,18 @@ export interface hDJControlStripWidget extends hDJWidget {
     controlStrip: hDJControlStripButton[];
 }
 
+export declare interface hDJControlStripWidget {
+    on(event: 'strip_play', listener: (row: number, cue: hDJControlStripButton) => void): this;
+    emit(event: 'strip_play', listener: (row: number, cue: hDJControlStripButton) => void): void;
+    on(event: 'change', listener: () => void): this;
+    emit(event: 'change', listener: () => void): void;
+}
+
+export declare interface hDJWidget {
+    on(event: 'change', listener: () => void): this;
+    emit(event: 'change', listener: () => void): void;
+}
+
 /**
  * Represents a ControlStripButton
  *

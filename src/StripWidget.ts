@@ -1,11 +1,10 @@
-import { Color, hDJRecvCmd, hDJRecvCoord } from "homebrewdj-launchpad-driver";
+import { Color, hDJRecvCmd, hDJRecvCoord, MessageType } from "homebrewdj-launchpad-driver";
 import { EventEmitter } from "stream";
 import { hDJControlStripButton, hDJControlStripWidget } from "./hDJMidiModel";
 
 const START_MIDI = 0x20;
 
 import { hDJMidiSend } from "./hDJMidiSend";
-//midiOutput.hDJSen
 
 export class StripWidget extends EventEmitter implements hDJControlStripWidget {
     inverted: boolean;
@@ -15,11 +14,11 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
     height: number = 1;
     port: number;
 
+    private selectedCue: hDJControlStripButton | null = null;
+
     offset: number = 0;
 
     private sender: hDJMidiSend = new hDJMidiSend();
-
-    //row: number;
 
     constructor(port: number, row: number, inverted: boolean) {
         super();
@@ -44,29 +43,56 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
     }
     processEvent(msg: hDJRecvCmd, data: hDJRecvCoord): void {
         let i = data.y;
+        let btn = this.controlStrip[i];
 
-        switch (this.controlStrip[i]) {
+        switch (btn) {
             case hDJControlStripButton.CUE1:
-                console.log("CUE1");
-                this.sender.send([msg.type | this.port, START_MIDI + (this.offset * this.width), msg.velocity])
-                break;
             case hDJControlStripButton.CUE2:
-                console.log("CUE2");
-                this.sender.send([msg.type | this.port, START_MIDI + (this.offset * this.width) + 1, msg.velocity])
-                break;
             case hDJControlStripButton.CUE3:
-                console.log("CUE3");
-                this.sender.send([msg.type | this.port, START_MIDI + (this.offset * this.width) + 2, msg.velocity])
+                this.playCue(btn, msg);
                 break;
             case hDJControlStripButton.TRACKSELECT:
                 console.log("TRACKSELECT");
                 this.sender.send([msg.type | this.port, START_MIDI + (this.offset * this.width) + 3, msg.velocity])
+                if (msg.type == MessageType.NOTE_OFF) {
+                    this.playing = !this.playing;
+                    if (!this.playing) {
+                        this.selectedCue = null;
+                    } else {
+                        this.selectedCue = hDJControlStripButton.CUE1;
+                    }
+                    this.emit("strip_play", this.offset, this.selectedCue);
+                }
                 break;
         }
+
+        this.emit("change");
     }
+
+    private playCue(cue: hDJControlStripButton, msg: hDJRecvCmd) {
+        this.sender.send([msg.type | this.port, START_MIDI + (this.offset * this.width) + cue, msg.velocity])
+        this.selectedCue = cue;
+        this.playing = true;
+        this.emit("strip_play", this.offset, cue);
+    }
+
+    stopStrip() {
+        this.playing = false;
+        this.selectedCue = null;
+        //TODO Send output to virtual midi port
+        //this.sender.send(messages.stop-strip)
+    }
+
     getAsBuffer(): number[] {
-        return this.controlStrip.map((e) => {
-            return e == hDJControlStripButton.TRACKSELECT ? Color.RED3 : Color.ORANGE2;
-        });
+        return [
+            ...this.controlStrip.map((e: hDJControlStripButton, index: number) => {
+                if (e == hDJControlStripButton.TRACKSELECT) {
+                    return this.playing ? Color.RED2 : Color.RED1;
+                } else {
+                    return e == this.selectedCue ? Color.ORANGE1 : Color.ORANGE5;
+                }
+            })
+        ]
+
     }
 }
