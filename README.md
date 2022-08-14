@@ -7,7 +7,7 @@ This Library implements a way to change Laucnhpad Mappings. Plan is to create a 
 [Read here](https://github.com/thallosaurus/homebrewdj-launchpad-driver#requirements) for more informations
 
 # Usage
-```yarn start```
+```yarn dev```
 
 # Controls
 Coming Soon
