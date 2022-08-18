@@ -1,4 +1,9 @@
-import { hDJMidiRecv, hDJRecvCmd, hDJRecvCoord, MessageType } from "homebrewdj-launchpad-driver";
+export * from './Deck';
+export * from './hDJMidiModel';
+export * from './hDJMidiSend';
+export * from './StripWidget';
+
+import { hDJMidiRecv, hDJRecvCmd, hDJRecvCoord } from "homebrewdj-launchpad-driver";
 import { hDJMidiSend } from "./hDJMidiSend";
 import { Deck } from "./Deck";
 import { hDJWidget } from "./hDJMidiModel";
@@ -9,16 +14,47 @@ export interface WidgetQueue {
     pos: hDJRecvCoord
 }
 
+/**
+ * Checks, if widget intersects the specified coordinates
+ *
+ * @param {hDJRecvCoord} sourcePoint
+ * @param {WidgetQueue} q
+ * @return {*} 
+ */
 function intersects(sourcePoint: hDJRecvCoord, q: WidgetQueue) {
     //console.log(sourcePoint, q);
     return sourcePoint.x >= q.pos.x && sourcePoint.x < q.pos.x + q.data.height
         && sourcePoint.y >= q.pos.y && sourcePoint.y < q.pos.y + q.data.width;
 }
 
+/**
+ * The Main Class
+ *
+ * @class Main
+ */
 class Main {
+
+    /**
+     * Holds all Widgets that are displayed on the device inclusive its coordinates
+     *
+     * @private
+     * @type {WidgetQueue[]}
+     * @memberof Main
+     */
     private queue: WidgetQueue[] = [];
+
+    /**
+     * Instance of the Launchpad driver
+     *
+     * @private
+     * @memberof Main
+     */
     private launchpad = new hDJMidiRecv();
 
+    /**
+     * Creates an instance of Main.
+     * @memberof Main
+     */
     constructor() {
         this.launchpad.connect(0, 0);
         const left = new Deck(0);
@@ -47,6 +83,13 @@ class Main {
         this.refreshScreen();
     }
 
+    /**
+     * Adds a Widget and its position to the widget queue
+     *
+     * @param {(hDJWidget & EventEmitter)} widget
+     * @param {hDJRecvCoord} pos
+     * @memberof Main
+     */
     addToQueue(widget: hDJWidget & EventEmitter, pos: hDJRecvCoord) {
         widget.on("change", () => {
             this.refreshScreen();
@@ -58,6 +101,13 @@ class Main {
         });
     }
 
+    /**
+     * Processes events from the launchpad driver
+     *
+     * @private
+     * @param {hDJRecvCmd} data
+     * @memberof Main
+     */
     private loopAlgo(data: hDJRecvCmd) {
         //console.log(data);
             let row = data.pos?.x;
@@ -79,6 +129,12 @@ class Main {
             }
     };
 
+    /**
+     * Redraws the widgets on the device
+     *
+     * @private
+     * @memberof Main
+     */
     private refreshScreen(): void {
         for (let e of this.queue) {
             this.launchpad.boundBuffer.setXY(e.data.getAsBuffer(), e.pos, e.data.width);

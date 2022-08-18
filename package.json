@@ -15,6 +15,7 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "dependencies": {
+    "ableton-live": "^0.0.6",
     "homebrewdj-launchpad-driver": "^0.0.4",
     "midi": "^2.0.0"
   },

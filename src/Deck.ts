@@ -1,14 +1,56 @@
 import { hDJRecvCmd, hDJRecvCoord } from "homebrewdj-launchpad-driver";
 import { EventEmitter } from "stream";
-import { hDJControlStripButton, hDJControlStripWidget, hDJWidget } from "./hDJMidiModel";
+import { hDJControlStripWidget, hDJWidget } from "./hDJMidiModel";
 import { StripWidget } from "./StripWidget";
 
+/**
+ * The Deck Holder. Is used to group elements together that correspond to one track
+ *
+ * @export
+ * @class Deck
+ * @extends {EventEmitter}
+ * @implements {hDJWidget}
+ */
 export class Deck extends EventEmitter implements hDJWidget {
+    
+    /**
+     * The Width of the Deck
+     *
+     * @type {number}
+     * @memberof Deck
+     */
     width: number = 4;
+
+    /**
+     * The Height of the Deck
+     *
+     * @type {number}
+     * @memberof Deck
+     */
     height: number = 6;
+
+    /**
+     * All child widgets of this deck
+     *
+     * @type {hDJWidget[]}
+     * @memberof Deck
+     */
     children: hDJWidget[] = [];
+
+    /**
+     * MIDI-Port Number
+     *
+     * @type {number}
+     * @memberof Deck
+     */
     port: number;
 
+    /**
+     * Creates an instance of Deck.
+     * @param {number} port
+     * @param {boolean} [inverted=false]
+     * @memberof Deck
+     */
     constructor(port: number, inverted: boolean = false) {
         super();
         this.port = port;
@@ -18,16 +60,14 @@ export class Deck extends EventEmitter implements hDJWidget {
         }
     }
 
+    /**
+     * Add child widget to this widget.
+     *
+     * @param {hDJControlStripWidget} widget
+     * @memberof Deck
+     */
     addChildWidget(widget: hDJControlStripWidget): void
     {
-        //widget.on("strip_play", (row) => {
-        /*    //console.log("Playing now on row", row);
-
-            let stopQueue = this.children.filter((v, i) => {
-                return i !== row
-            });
-        });*/
-
         widget.on("strip_play", (row, cue) => {
             console.log("row", row, "cue", cue);
             let stopQueue = this.children.filter((v, i) => {
@@ -58,6 +98,12 @@ export class Deck extends EventEmitter implements hDJWidget {
         this.emit("change");
     }
 
+    /**
+     * Constructs a framebuffer frame for the launchpad driver
+     *
+     * @return {*}  {number[]}
+     * @memberof Deck
+     */
     getAsBuffer(): number[] {
         let b: number[] = [];
 
