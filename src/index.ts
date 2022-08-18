@@ -9,6 +9,12 @@ import { Deck } from "./Deck";
 import { hDJWidget } from "./hDJMidiModel";
 import { EventEmitter } from "stream";
 
+/**
+ * Data for one Widget
+ *
+ * @export
+ * @interface WidgetQueue
+ */
 export interface WidgetQueue {
     data: hDJWidget & EventEmitter,
     pos: hDJRecvCoord
