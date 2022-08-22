@@ -26,6 +26,12 @@ export interface hDJControlStripWidget extends hDJWidget {
     controlStrip: hDJControlStripButton[];
 }
 
+/**
+ * Event Declaration for the Control Strip Widget
+ *
+ * @export
+ * @interface hDJControlStripWidget
+ */
 export declare interface hDJControlStripWidget {
     on(event: 'strip_play', listener: (row: number, cue: hDJControlStripButton) => void): this;
     emit(event: 'strip_play', listener: (row: number, cue: hDJControlStripButton) => void): void;
@@ -33,6 +39,12 @@ export declare interface hDJControlStripWidget {
     emit(event: 'change', listener: () => void): void;
 }
 
+/**
+ * Event Declaration shared for all 
+ *
+ * @export
+ * @interface hDJWidget
+ */
 export declare interface hDJWidget {
     on(event: 'change', listener: () => void): this;
     emit(event: 'change', listener: () => void): void;
