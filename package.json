@@ -15,8 +15,10 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "dependencies": {
+    "ableton-js": "^2.5.1",
     "homebrewdj-launchpad-driver": "^0.0.4",
-    "midi": "^2.0.0"
+    "midi": "^2.0.0",
+    "ws": "^8.8.1"
   },
   "repository": {
     "type": "git",
@@ -47,12 +49,13 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "start": "dist/index.js",
+    "start": "ts-node dist/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
     "prepare": "yarn build",
     "push:version": "yarn version --patch",
     "test": "echo 'all checks passed (dummy)' && exit 0",
-    "generate:docs": "typedoc"
+    "generate:docs": "typedoc",
+    "start:ableton": "nodemon examples/AbletonTest.js"
   }
 }

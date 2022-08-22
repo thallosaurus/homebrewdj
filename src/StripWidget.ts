@@ -1,6 +1,7 @@
 import { Color, hDJRecvCmd, hDJRecvCoord, MessageType } from "homebrewdj-launchpad-driver";
 import { EventEmitter } from "stream";
 import { hDJControlStripButton, hDJControlStripWidget } from "./hDJMidiModel";
+import { Ableton } from "ableton-js";
 
 const START_MIDI = 0x20;
 
@@ -19,6 +20,7 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
     offset: number = 0;
 
     private sender: hDJMidiSend = new hDJMidiSend();
+    private static abletonjs = new Ableton();
 
     constructor(port: number, row: number, inverted: boolean) {
         super();

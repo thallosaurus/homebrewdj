@@ -8,7 +8,7 @@
             "name": "Launch via NPM",
             "request": "launch",
             "runtimeArgs": [
-                "debug",
+                "start:ableton",
             ],
             "runtimeExecutable": "yarn",
             "skipFiles": [

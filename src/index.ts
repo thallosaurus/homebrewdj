@@ -10,7 +10,6 @@ export interface WidgetQueue {
 }
 
 function intersects(sourcePoint: hDJRecvCoord, q: WidgetQueue) {
-    //console.log(sourcePoint, q);
     return sourcePoint.x >= q.pos.x && sourcePoint.x < q.pos.x + q.data.height
         && sourcePoint.y >= q.pos.y && sourcePoint.y < q.pos.y + q.data.width;
 }
@@ -20,7 +19,8 @@ class Main {
     private launchpad = new hDJMidiRecv();
 
     constructor() {
-        this.launchpad.connect(0, 0);
+        console.log(this.launchpad.enumeratePorts());
+        this.launchpad.connect(1, 1);
         const left = new Deck(0);
         this.addToQueue(left, {
             x: 0,
@@ -82,7 +82,6 @@ class Main {
     private refreshScreen(): void {
         for (let e of this.queue) {
             this.launchpad.boundBuffer.setXY(e.data.getAsBuffer(), e.pos, e.data.width);
-
         }
     }
 }
@@ -93,6 +92,8 @@ class Main {
  */
 export function mainTui() {
     let main = new Main();
+
+    //init animation loop here?
 }
 mainTui();
 
