@@ -6,6 +6,8 @@ import { Ableton } from "ableton-js";
 const START_MIDI = 0x20;
 
 import { hDJMidiSend } from "./hDJMidiSend";
+import { Clip } from "ableton-js/ns/clip";
+import { ClipSlot } from "ableton-js/ns/clip-slot";
 
 /**
  * The Musictrack Control Strip. Holds controls for 3 cue points and the track selector
@@ -91,6 +93,8 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
      */
     private sender: hDJMidiSend = new hDJMidiSend();
 
+    private assignedClip: Clip;
+
     /**
      * Creates an instance of StripWidget.
      * @param {number} port
@@ -98,13 +102,17 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
      * @param {boolean} inverted
      * @memberof StripWidget
      */
-    constructor(port: number, row: number,  ableton: Ableton, inverted: boolean) {
+    constructor(port: number, assignedClip: Clip, row: number, inverted: boolean) {
         super();
         this.port = port;
         this.offset = row;
         this.inverted = inverted;
         this.playing = false;
-        this.ableton = ableton;
+        this.assignedClip = assignedClip;
+
+        //7 errors with same data?
+
+        console.log("Creating Strip Widget for track title", assignedClip.raw.name);
         if (this.inverted) {
             this.controlStrip = [
                 hDJControlStripButton.TRACKSELECT,
@@ -120,7 +128,6 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
                 hDJControlStripButton.TRACKSELECT,
             ];
     }
-    ableton: Ableton;
 
     /**
      * Processes the command sent from the device
@@ -137,19 +144,26 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
             case hDJControlStripButton.CUE1:
             case hDJControlStripButton.CUE2:
             case hDJControlStripButton.CUE3:
-                this.playCue(btn, msg);
+                //this.playCue(btn, msg);
+                this.playLoop(btn, msg);
                 break;
             case hDJControlStripButton.TRACKSELECT:
                 console.log("TRACKSELECT");
-                this.sender.send([msg.type | this.port, START_MIDI + (this.offset * this.width) + 3, msg.velocity])
-                if (msg.type == MessageType.NOTE_OFF) {
-                    this.playing = !this.playing;
-                    if (!this.playing) {
+                //this.sender.send([msg.type | this.port, START_MIDI + (this.offset * this.width) + 3, msg.velocity])
+                
+                if (msg.type == MessageType.NOTE_ON) {
+                    //console.log("assignedClip", this.assignedClip);
+                    //this.assignedClip.set("is_playing", true);
+                    
+                        //console.log("is track now playing?", playState);
+                        this.playing = !this.playing;
+                        //if (!this.playing) {
                         this.selectedCue = null;
-                    } else {
-                        this.selectedCue = hDJControlStripButton.CUE1;
-                    }
-                    this.emit("strip_play", this.offset, this.selectedCue);
+                        /*} else {
+                            this.selectedCue = hDJControlStripButton.CUE1;
+                        }*/
+                        this.emit("strip_play", this.offset, this.selectedCue);
+
                 }
                 break;
         }
@@ -164,12 +178,21 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
      * @param {hDJControlStripButton} cue
      * @param {hDJRecvCmd} msg
      * @memberof StripWidget
+     * @deprecated
      */
     private playCue(cue: hDJControlStripButton, msg: hDJRecvCmd) {
         this.sender.send([msg.type | this.port, START_MIDI + (this.offset * this.width) + cue, msg.velocity])
         this.selectedCue = cue;
         this.playing = true;
         this.emit("strip_play", this.offset, cue);
+    }
+    
+    private playLoop(loop: hDJControlStripButton, msg: hDJRecvCmd) {
+        this.selectedCue = loop;
+        /*this.assignedClip.fire().then(() => {
+            this.playing = true;
+        });*/
+        this.emit("strip_play", this.offset, loop);
     }
 
     /**

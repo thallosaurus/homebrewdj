@@ -1,4 +1,5 @@
 import { Ableton } from "ableton-js";
+import { Track } from "ableton-js/ns/track";
 import { hDJRecvCmd, hDJRecvCoord } from "homebrewdj-launchpad-driver";
 import { EventEmitter } from "stream";
 import { hDJControlStripWidget, hDJWidget } from "./hDJMidiModel";
@@ -46,22 +47,37 @@ export class Deck extends EventEmitter implements hDJWidget {
      */
     port: number;
 
+    //abTrack: Track;
+
     /**
      * Creates an instance of Deck.
      * @param {number} port
      * @param {boolean} [inverted=false]
      * @memberof Deck
      */
-    constructor(port: number, ableton: Ableton, inverted: boolean = false) {
+    constructor(port: number, track: Track, inverted: boolean = false) {
         super();
-        this.ableton = ableton;
         this.port = port;
-        for (let row = 0; row < this.height; row++) {
-            let strip = new StripWidget(this.port, row, this.ableton, inverted)
-            this.addChildWidget(strip)
-        }
+        //this.abTrack = track;
+
+        let mod = 0;
+        track.get("clip_slots").then((clipSlots) => {
+            clipSlots.forEach(async slot => {
+                
+                if (await slot.get("has_clip")) {
+                    let clip = await slot.get("clip");
+                    //console.log("clip", clip);
+                    
+                    //let strip = new StripWidget(this.port, row, this.abTrack, inverted)
+                    //this.addChildWidget(strip))
+                    
+                    let strip = new StripWidget(this.port, clip!, mod, (mod % 1) == 1);
+                    this.addChildWidget(strip);
+                    mod++;
+                }
+            });
+        });
     }
-    ableton: Ableton;
 
     /**
      * Add child widget to this widget.

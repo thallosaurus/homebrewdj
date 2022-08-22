@@ -8,25 +8,13 @@
             "name": "Launch via NPM",
             "request": "launch",
             "runtimeArgs": [
-                "start:ableton",
+                "dev"
             ],
             "runtimeExecutable": "yarn",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "type": "node"
-        },
-        {
-            "type": "pwa-node",
-            "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/dist/index.js",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ]
         }
     ]
 }

@@ -68,16 +68,36 @@ class Main {
         console.log(this.launchpad.enumeratePorts());
         this.launchpad.connect(1, 1);
 
-        const left = new Deck(0, this.abletonjs);
-        this.addToQueue(left, {
-            x: 0,
-            y: 0
+        this.abletonjs.on("error", (e) => {
+            console.error(e);
+        })
+
+        this.abletonjs.on("message", (e) => {
+        //console.log(e);
         });
-        
-        const right = new Deck(1, this.abletonjs, true);
-        this.addToQueue(right, {
-            x: 0,
-            y: 4
+
+        //this.abletonjs.song.addListener("tempo", (t) => console.log("Tempo:", t));
+
+        //this.abletonjs.song.addListener("is_playing", (p) => console.log("Playing:", p));
+
+        this.abletonjs.on("connect", async (e) => {
+            let tracks = await this.abletonjs.song.get("tracks");
+
+            let i = 0;
+            if (tracks.length == 2) {
+                for (let t of tracks) {
+                    const deck = new Deck(i, t, (i & 1) == 1);
+                    
+                    this.addToQueue(deck, {
+                        x: 0,
+                        y: i * 4
+                    });
+                    
+                    i++;
+                }
+            } else {
+                throw new Error("Please add only two audio Tracks");
+            }
         });
 
 

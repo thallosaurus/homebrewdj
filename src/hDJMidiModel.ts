@@ -11,7 +11,6 @@ export interface hDJWidget {
     port: number;
     width: number;
     height: number;
-    ableton: Ableton;
     getAsBuffer(): number[];
     processEvent(msg: hDJRecvCmd, data: hDJRecvCoord): void;
 }
