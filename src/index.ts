@@ -9,6 +9,8 @@ import { Deck } from "./Deck";
 import { hDJWidget } from "./hDJMidiModel";
 import { EventEmitter } from "stream";
 
+import { Ableton } from 'ableton-js';
+
 /**
  * Data for one Widget
  *
@@ -56,6 +58,8 @@ class Main {
      */
     private launchpad = new hDJMidiRecv();
 
+    private abletonjs = new Ableton();
+
     /**
      * Creates an instance of Main.
      * @memberof Main
@@ -63,13 +67,14 @@ class Main {
     constructor() {
         console.log(this.launchpad.enumeratePorts());
         this.launchpad.connect(1, 1);
-        const left = new Deck(0);
+
+        const left = new Deck(0, this.abletonjs);
         this.addToQueue(left, {
             x: 0,
             y: 0
         });
         
-        const right = new Deck(1, true);
+        const right = new Deck(1, this.abletonjs, true);
         this.addToQueue(right, {
             x: 0,
             y: 4

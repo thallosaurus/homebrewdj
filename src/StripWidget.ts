@@ -90,7 +90,6 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
      * @memberof StripWidget
      */
     private sender: hDJMidiSend = new hDJMidiSend();
-    private static abletonjs = new Ableton();
 
     /**
      * Creates an instance of StripWidget.
@@ -99,12 +98,13 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
      * @param {boolean} inverted
      * @memberof StripWidget
      */
-    constructor(port: number, row: number, inverted: boolean) {
+    constructor(port: number, row: number,  ableton: Ableton, inverted: boolean) {
         super();
         this.port = port;
         this.offset = row;
         this.inverted = inverted;
         this.playing = false;
+        this.ableton = ableton;
         if (this.inverted) {
             this.controlStrip = [
                 hDJControlStripButton.TRACKSELECT,
@@ -120,6 +120,7 @@ export class StripWidget extends EventEmitter implements hDJControlStripWidget {
                 hDJControlStripButton.TRACKSELECT,
             ];
     }
+    ableton: Ableton;
 
     /**
      * Processes the command sent from the device

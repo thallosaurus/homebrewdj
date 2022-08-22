@@ -1,3 +1,4 @@
+import { Ableton } from "ableton-js";
 import { hDJRecvCmd, hDJRecvCoord } from "homebrewdj-launchpad-driver";
 
 /**
@@ -10,6 +11,7 @@ export interface hDJWidget {
     port: number;
     width: number;
     height: number;
+    ableton: Ableton;
     getAsBuffer(): number[];
     processEvent(msg: hDJRecvCmd, data: hDJRecvCoord): void;
 }

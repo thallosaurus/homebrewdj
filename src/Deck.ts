@@ -1,3 +1,4 @@
+import { Ableton } from "ableton-js";
 import { hDJRecvCmd, hDJRecvCoord } from "homebrewdj-launchpad-driver";
 import { EventEmitter } from "stream";
 import { hDJControlStripWidget, hDJWidget } from "./hDJMidiModel";
@@ -51,14 +52,16 @@ export class Deck extends EventEmitter implements hDJWidget {
      * @param {boolean} [inverted=false]
      * @memberof Deck
      */
-    constructor(port: number, inverted: boolean = false) {
+    constructor(port: number, ableton: Ableton, inverted: boolean = false) {
         super();
+        this.ableton = ableton;
         this.port = port;
         for (let row = 0; row < this.height; row++) {
-            let strip = new StripWidget(this.port, row, inverted)
+            let strip = new StripWidget(this.port, row, this.ableton, inverted)
             this.addChildWidget(strip)
         }
     }
+    ableton: Ableton;
 
     /**
      * Add child widget to this widget.
